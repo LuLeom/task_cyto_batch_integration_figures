@@ -15,7 +15,8 @@ makePlots <- function(methods, cols_to_plot, cellType = "all", dataset,
                                             unintegrated$obs),
                                       check.names = FALSE),
                       cols_to_plot = cols_to_plot, 
-                      cellType = cellType)
+                      cellType = cellType,
+                      show_controls = show_controls)
   for (i in 1:length(tmp)){
     tmp[[i]] <- tmp[[i]] + ggtitle(cols_to_plot[i])
   }
@@ -37,7 +38,10 @@ makePlots <- function(methods, cols_to_plot, cellType = "all", dataset,
                                   sub("_control", "Ctrl", 
                                       sub("_controls", "Ctrls", method)))))
       method_short <- paste0(method_short, "_", sub("split", "", split))
-      tmp <- densityPlots(df, cols_to_plot = cols_to_plot)
+      tmp <- densityPlots(df, 
+                          cols_to_plot = cols_to_plot, 
+                          cellType = cellType,
+                          show_controls = show_controls)
       tmp[[1]] <- tmp[[1]] + ylab(method_short)
       pList[[method_short]] <- tmp
     }
