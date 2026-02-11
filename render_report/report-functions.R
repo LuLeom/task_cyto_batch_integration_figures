@@ -562,10 +562,11 @@ label_time <- function(time) {
 #' @details
 #' Values are restricted to between 0 and 1 and missing values are replaced by
 #' 0. For use in creating the summary FunkyHeatmap
-aggregate_scores <- function(scores) {
-  # scores[is.na(scores)] <- 0
-  scores[scores < 0] <- 0
-  scores[scores > 1] <- 1
-
-  mean(scores, na.rm = TRUE)
+aggregate_scores <- function(scores, replace_na = TRUE) {
+   if (replace_na) {
+     scores[is.na(scores)] <- 0
+   }
+   scores[scores < 0] <- 0
+   scores[scores > 1] <- 1
+   mean(scores, na.rm = TRUE)
 }
