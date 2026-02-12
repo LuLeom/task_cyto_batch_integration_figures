@@ -7,7 +7,7 @@ makePlots <- function(methods, cols_to_plot, cellType = "all", dataset,
   pList <- list()
   
   # Make plot for unintegrated data
-  unintegrated <- anndata::read_h5ad(paste0("unintegrated/", dataset, ".h5ad"))
+  unintegrated <- anndata::read_h5ad(paste0("intermediate_files/", dataset, "/unintegrated.h5ad"))
   
   df <- unintegrated$layers['preprocessed']
   colnames(df) <- paste0(unintegrated$var[["marker"]], " (", unintegrated$var[["channel"]], ")")
