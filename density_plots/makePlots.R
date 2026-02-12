@@ -16,7 +16,8 @@ makePlots <- function(methods, cols_to_plot, cellType = "all", dataset,
                                       check.names = FALSE),
                       cols_to_plot = cols_to_plot, 
                       cellType = cellType,
-                      show_controls = show_controls)
+                      show_controls = show_controls,
+                      manXlim = manXlim)
   for (i in 1:length(tmp)){
     tmp[[i]] <- tmp[[i]] + ggtitle(cols_to_plot[i])
   }
