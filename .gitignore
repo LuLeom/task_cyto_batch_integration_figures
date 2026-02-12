@@ -3,3 +3,5 @@ data/*
 
 .DS_Store
 /output
+.Rproj.user
+/intermediate_files
