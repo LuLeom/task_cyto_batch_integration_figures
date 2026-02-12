@@ -1,10 +1,12 @@
 # Create custom funky heatmap for the paper.
 # Code is highly based on openproblems report template qmd file.
 
+options(tibble.width = Inf, tibble.print_max = 100)
+
 params <- list(
-  task_results_json = "/Users/putri.g/Documents/cytobenchmark/run_2026-02-06_14-25-48/report/task_cyto_batch_integration/local_20260206_231526/combined_output.json",
+  task_results_json = "/Users/putri.g/Documents/cytobenchmark/run_2026-02-10_12-41-38/task_cyto_batch_integration/local_20260211_133112/combined_output.json",
   functions = "render_report/report-functions.R",
-  outdir = "output/2026-02-06_14-25-48"
+  outdir = "output/2026-02-10_12-41-38"
 )
 source(params$functions)
 dir.create(params$outdir, recursive = TRUE)
@@ -119,8 +121,6 @@ n_controls <- purrr::map_dfr(task_results$results, function(.result) {
   dplyr::mutate(dataset = factor(dataset, levels = dataset_names)) |>
   tidyr::complete(dataset, fill = list(n_controls = 0))
 
-has_controls <- all(n_controls$n_controls >= 2)
-
 dataset_details <- purrr::map_dfr(dataset_info, function(.dataset) {
   data.frame(
     dataset = .dataset$name,
@@ -154,7 +154,7 @@ method_details <- purrr::map_dfr(method_info, function(.method) {
   ) |>
   dplyr::arrange(method)
 
-# rename "Shuffle Integration — within cell type" to Shuffle Integration Within cell type"
+# TODO update the method itself! rename "Shuffle Integration — within cell type" to Shuffle Integration Within cell type"
 method_details <- method_details |>
   dplyr::mutate(
     method_label = stringr::str_replace_all(
@@ -178,6 +178,23 @@ metric_details <- purrr::map_dfr(metric_info, function(.metric) {
   dplyr::left_join(metric_types, by = "metric") |>
   dplyr::mutate(metric_label = ifelse(metric_maximize, metric_label, paste0(metric_label, "*"))) |>
   dplyr::arrange(metric)
+
+# TODO update the metric itself! remove CT and "Cell Type" from metric_label
+metric_details <- metric_details |>
+  dplyr::mutate(
+    metric_label = stringr::str_replace_all(
+      metric_label,
+      " CT",
+      ""
+    )
+  ) |>
+  dplyr::mutate(
+    metric_label = stringr::str_replace_all(
+      metric_label,
+      " Cell Type",
+      ""
+    )
+  )
 
 metric_reverse <- metric_details |>
   dplyr::filter(metric_maximize == FALSE) |>
@@ -242,20 +259,17 @@ complete_scores <- tidyr::expand_grid(
   dplyr::relocate(metric, .after = dplyr::last_col()) |>
   dplyr::left_join(metric_details, by = "metric") |>
   dplyr::left_join(scaled_scores, by = c("dataset", "method", "metric")) |>
-#   tidyr::replace_na(list(scaled_value = 0)) |>
+  tidyr::replace_na(list(scaled_value = 0)) |>
   dplyr::arrange(dataset, method, metric)
 
-
-
-# we don't want emd_mean_ct_vert here for human blood mass cytometry data
-# as it could not be calculated!
+# we don't want emd_mean_ct_vert for human blood mass cytometry data
+# as it was not calculated.
 complete_scores <- complete_scores |>
   dplyr::filter(
     !(dataset == "human_blood_mass_cytometry" & metric == "emd_mean_ct_vert")
   )
 
 # results table
-
 mean_scores <- complete_scores |>
   dplyr::group_by(dataset, method, metric_type) |>
   dplyr::summarise(
@@ -269,23 +283,19 @@ mean_scores <- complete_scores |>
   ) |> 
   dplyr::rowwise() |>
   dplyr::mutate(
-    mean_score = mean(c(mean_batch_mixing, mean_bio_conservation), na.rm = TRUE)
+    mean_score = aggregate_scores(c(mean_batch_mixing, mean_bio_conservation))
   ) |>
   dplyr::ungroup()
 
 # export raw values separately
-dataset_scores <- complete_scores |>
+raw_dataset_scores <- complete_scores |>
   dplyr::select(dataset, method, metric, value) |>
   tidyr::pivot_wider(
     names_from = metric,
     values_from = value
   )
-write.csv(dataset_scores, file.path(params$outdir, "raw_dataset_scores.csv"), row.names = FALSE)
+write.csv(raw_dataset_scores, file.path(params$outdir, "raw_dataset_scores.csv"), row.names = FALSE)
 
-# by dataset scores, the NA for emd mean vertical for human blood mass cytometry will be visible.
-# because of the nature of the group by.
-# hence we need to disable the aggregate scores so NA is not replaced by 0..
-# as we just didn't calculate it. It does not mean it existed!
 dataset_scores <- complete_scores |>
   dplyr::select(dataset, method, metric, scaled_value) |>
   tidyr::pivot_wider(
@@ -294,18 +304,21 @@ dataset_scores <- complete_scores |>
   ) |>
   dplyr::left_join(mean_scores, by = c("dataset", "method"))
 
-
+# the NA for emd mean vertical for human blood mass cytometry will be visible.
+# because of the nature of the group by.
+# hence we need to disable the aggregate scores so NA is not replaced by 0..
+# as we just didn't calculate it. It does not mean it existed!
 overall_scores <- dataset_scores |>
   dplyr::group_by(method) |>
   dplyr::summarise(
     dataset = "overall",
     dplyr::across(
       tidyselect::where(is.numeric),
-      aggregate_scores
+      ~ aggregate_scores(.x, replace_na = FALSE)
     ),
     .groups = "drop"
   )
-
+write.csv(overall_scores, file.path(params$outdir, "overall_scores.csv"), row.names = FALSE)
 
 resources <- purrr::map_dfr(task_results$results, function(.result) {
   data.frame(
@@ -537,7 +550,7 @@ funkyheatmap::funky_heatmap(
     col_bigspace = 1.5,
     col_annot_offset = 4
   )
-) + ggplot2::labs(caption = "Note: Metrics with an asterisk (*) have been reversed so higher values indicate better performance.")
+)
 ggplot2::ggsave(file.path(params$outdir, "funky_heatmap.png"), width = 20, height = 16, limitsize = FALSE)
 
 
