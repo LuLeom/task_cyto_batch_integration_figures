@@ -21,9 +21,7 @@ library(anndata)
 ```{r}
 source("utils/anndata_to_df.R")
 source("utils/helper_functions.R")
-source("density_plots/densityPlots.R")
-source("density_plots/makePlots.R")
-source("density_plots/pList_to_pdf.R")
+source("density_plots/EMD_densities.R")
 source("heatmap_plots/EMD_heatmaps.R")
 ```
 
@@ -39,27 +37,27 @@ EMD_toMid <- read_h5ad("intermediate_files/mouse_spleen_flow_cytometry/metric_ou
 ```{r}
 source("heatmap_plots/EMD_heatmaps.R")
 
-pdf("output/CN_noCtrls_toGoal_EMDHor_heatmap.pdf", height = 8)
+pdf("output/EMDHor_CN_noCtrls_toGoal_heatmap.pdf", height = 8)
 EMDHor_heatmap(EMD_toGoal$uns$emd_values$emd_values_horiz)
 dev.off()
 
-pdf("output/CN_noCtrls_toGoal_EMDVer1_heatmap.pdf", height = 8)
+pdf("output/EMDVer1_CN_noCtrls_toGoal_heatmap.pdf", height = 8)
 EMDVert_heatmap(EMD_toGoal$uns$emd_values$emd_values_vert_split1)
 dev.off()
 
-pdf("output/CN_noCtrls_toGoal_EMDVer2_heatmap.pdf", height = 8)
+pdf("output/EMDVer2_CN_noCtrls_toGoal_heatmap.pdf", height = 8)
 EMDVert_heatmap(EMD_toGoal$uns$emd_values$emd_values_vert_split2)
 dev.off()
 
-pdf("output/CN_noCtrls_toMid_EMDHor_heatmap.pdf", height = 8)
+pdf("output/EMDHor_CN_noCtrls_toMid_heatmap.pdf", height = 8)
 EMDHor_heatmap(EMD_toMid$uns$emd_values$emd_values_horiz)
 dev.off()
 
-pdf("output/CN_noCtrls_toMid_EMDVer1_heatmap.pdf", height = 8)
+pdf("output/EMDVer1_CN_noCtrls_toMid_heatmap.pdf", height = 8)
 EMDVert_heatmap(EMD_toMid$uns$emd_values$emd_values_vert_split1)
 dev.off()
 
-pdf("output/CN_noCtrls_toMid_EMDVer2_heatmap.pdf", height = 8)
+pdf("output/EMDVer2_CN_noCtrls_toMid_heatmap.pdf", height = 8)
 EMDVert_heatmap(EMD_toMid$uns$emd_values$emd_values_vert_split2)
 dev.off()
 ```
@@ -68,44 +66,121 @@ CD64#BV711 and CD19#PE-Cy5 for monocytes and neutrophils
 All markers for cDC1s
 
 ### Make density plots
+#### monocytes
 ```{r}
 methods <- c("cytonorm_no_controls_to_goal", "cytonorm_no_controls_to_mid")
 
-pList_to_pdf(methods = methods, 
-             cols_to_plot = c("CD64#BV711 (V710-A)", "CD19#PE-Cy5 (YG670-A)"), 
-             cellType = "Monocytes", dataset = "mouse_spleen_flow_cytometry", 
-             fileName = "output/densityPlots_monocytes.pdf")
+EMDVert_densities(methods = methods, 
+                  cols_to_plot = c("CD64#BV711 (V710-A)", "CD19#PE-Cy5 (YG670-A)"), 
+                  cellType = "Monocytes", dataset = "mouse_spleen_flow_cytometry", 
+                  fileName = "output/EMDVer_densityPlots_monocytes.pdf")
 
-pList_to_pdf(methods = methods, 
-             cols_to_plot = c("CD64#BV711 (V710-A)", "CD19#PE-Cy5 (YG670-A)"), 
-             cellType = "Neutrophils", dataset = "mouse_spleen_flow_cytometry", 
-             fileName = "output/densityPlots_neutrophils.pdf")
+EMDHor_densities(method = "cytonorm_no_controls_to_goal", 
+                 cols_to_plot = c("CD64#BV711 (V710-A)", "CD19#PE-Cy5 (YG670-A)"), 
+                 cellType = "Monocytes", dataset = "mouse_spleen_flow_cytometry", 
+                 fileName = "output/EMDHor_CN_noCtrls_toGoal_densityPlots_monocytes.pdf")
+EMDHor_densities(method = "cytonorm_no_controls_to_mid", 
+                 cols_to_plot = c("CD64#BV711 (V710-A)", "CD19#PE-Cy5 (YG670-A)"), 
+                 cellType = "Monocytes", dataset = "mouse_spleen_flow_cytometry", 
+                 fileName = "output/EMDHor_CN_noCtrls_toMid_densityPlots_monocytes.pdf")
+```
 
-pList_to_pdf(methods = methods, 
-             cols_to_plot = c("CD64#BV711 (V710-A)", "CD19#PE-Cy5 (YG670-A)"), 
-             cellType = "B cells", dataset = "mouse_spleen_flow_cytometry", 
-             fileName = "output/densityPlots_Bcells.pdf")
+#### neutrophils
+```{r}
+EMDVert_densities(methods = methods, 
+                  cols_to_plot = c("CD64#BV711 (V710-A)", "CD19#PE-Cy5 (YG670-A)"), 
+                  cellType = "Neutrophils", dataset = "mouse_spleen_flow_cytometry", 
+                  fileName = "output/EMDVer_densityPlots_neutrophils.pdf")
+ 
+EMDHor_densities(method = "cytonorm_no_controls_to_goal", 
+                 cols_to_plot = c("CD64#BV711 (V710-A)", "CD19#PE-Cy5 (YG670-A)"), 
+                 cellType = "Neutrophils", dataset = "mouse_spleen_flow_cytometry", 
+                 fileName = "output/EMDHor_CN_noCtrls_toGoal_densityPlots_neutrophils.pdf")
+EMDHor_densities(method = "cytonorm_no_controls_to_mid", 
+                 cols_to_plot = c("CD64#BV711 (V710-A)", "CD19#PE-Cy5 (YG670-A)"), 
+                 cellType = "Neutrophils", dataset = "mouse_spleen_flow_cytometry", 
+                 fileName = "output/EMDHor_CN_noCtrls_toMid_densityPlots_neutrophils.pdf")
+```
 
-pList_to_pdf(methods = methods, 
-             cols_to_plot = c(" (FSC-A)", " (SSC-A)",
-                              "CD103#BUV395 (UV379-A)", "CD4#BUV496 (UV515-A)", 
-                              "CD8a#BUV615 (UV610-A)", "CD86#BUV735 (UV735-A)", 
-                              "CD62L#BV421 (V431-A)", "XCR1#BV510 (V525-A)", 
-                              "Ly6C#BV570 (V586-A)", "CD161#BV605 (V605-A)", 
-                              "Ly6G#BV650 (V677-A)", "CD64#BV711 (V710-A)", 
-                              "CD11c#BV750 (V750-A)", "F4/80#BV786 (V810-A)", 
-                              "MHCII#FITC (B530-A)", "CD69#BB700 (B710-A)", 
-                              "CD3e#PE (YG586-A)", "CD11b#PE-CF594 (YG610-A)", 
-                              "CD19#PE-Cy5 (YG670-A)", "PD1#PE-Cy7 (YG780-A)", 
-                              "CD63#AF647 (R670-A)", "CD44#RedFluor710 (R730-A)"), 
-             cellType = "Mature cDC1s", dataset = "mouse_spleen_flow_cytometry", 
-             fileName = "output/densityPlots_matureCDC1s.pdf")
+#### B cells
+```{r}
+EMDVert_densities(methods = methods, 
+                  cols_to_plot = c("CD64#BV711 (V710-A)", "CD19#PE-Cy5 (YG670-A)"), 
+                  cellType = "B cells", dataset = "mouse_spleen_flow_cytometry", 
+                  fileName = "output/EMDVer_densityPlots_Bcells.pdf")
 
-pList_to_pdf(methods = methods, 
-             cols_to_plot = c(" (FSC-A)", " (SSC-A)"), 
-             cellType = "Macrophages", dataset = "mouse_spleen_flow_cytometry", 
-             fileName = "output/densityPlots_macrophages.pdf")
+EMDHor_densities(method = "cytonorm_no_controls_to_goal", 
+                 cols_to_plot = c("CD64#BV711 (V710-A)", "CD19#PE-Cy5 (YG670-A)"), 
+                 cellType = "B cells", dataset = "mouse_spleen_flow_cytometry", 
+                 fileName = "output/EMDHor_CN_noCtrls_toGoal_densityPlots_Bcells.pdf")
+EMDHor_densities(method = "cytonorm_no_controls_to_mid", 
+                 cols_to_plot = c("CD64#BV711 (V710-A)", "CD19#PE-Cy5 (YG670-A)"), 
+                 cellType = "B cells", dataset = "mouse_spleen_flow_cytometry", 
+                 fileName = "output/EMDHor_CN_noCtrls_toMid_densityPlots_Bcells.pdf")
+```
 
+#### cDC1s
+```{r}
+EMDVert_densities(methods = methods, 
+                  cols_to_plot = c(" (FSC-A)", " (SSC-A)",
+                                   "CD103#BUV395 (UV379-A)", "CD4#BUV496 (UV515-A)", 
+                                   "CD8a#BUV615 (UV610-A)", "CD86#BUV735 (UV735-A)", 
+                                   "CD62L#BV421 (V431-A)", "XCR1#BV510 (V525-A)", 
+                                   "Ly6C#BV570 (V586-A)", "CD161#BV605 (V605-A)", 
+                                   "Ly6G#BV650 (V677-A)", "CD64#BV711 (V710-A)", 
+                                   "CD11c#BV750 (V750-A)", "F4/80#BV786 (V810-A)", 
+                                   "MHCII#FITC (B530-A)", "CD69#BB700 (B710-A)", 
+                                   "CD3e#PE (YG586-A)", "CD11b#PE-CF594 (YG610-A)", 
+                                   "CD19#PE-Cy5 (YG670-A)", "PD1#PE-Cy7 (YG780-A)", 
+                                   "CD63#AF647 (R670-A)", "CD44#RedFluor710 (R730-A)"), 
+                  cellType = "Mature cDC1s", dataset = "mouse_spleen_flow_cytometry", 
+                  fileName = "output/EMDVer_densityPlots_matureCDC1s.pdf")
+
+EMDHor_densities(method = "cytonorm_no_controls_to_goal", 
+                 cols_to_plot = c(" (FSC-A)", " (SSC-A)",
+                                  "CD103#BUV395 (UV379-A)", "CD4#BUV496 (UV515-A)", 
+                                  "CD8a#BUV615 (UV610-A)", "CD86#BUV735 (UV735-A)", 
+                                  "CD62L#BV421 (V431-A)", "XCR1#BV510 (V525-A)", 
+                                  "Ly6C#BV570 (V586-A)", "CD161#BV605 (V605-A)", 
+                                  "Ly6G#BV650 (V677-A)", "CD64#BV711 (V710-A)", 
+                                  "CD11c#BV750 (V750-A)", "F4/80#BV786 (V810-A)", 
+                                  "MHCII#FITC (B530-A)", "CD69#BB700 (B710-A)", 
+                                  "CD3e#PE (YG586-A)", "CD11b#PE-CF594 (YG610-A)", 
+                                  "CD19#PE-Cy5 (YG670-A)", "PD1#PE-Cy7 (YG780-A)", 
+                                  "CD63#AF647 (R670-A)", "CD44#RedFluor710 (R730-A)"), 
+                 cellType = "Mature cDC1s", dataset = "mouse_spleen_flow_cytometry", 
+                 fileName = "output/EMDHor_CN_noCtrls_toGoal_densityPlots_matureCDC1s.pdf")
+EMDHor_densities(method = "cytonorm_no_controls_to_mid", 
+                 cols_to_plot = c(" (FSC-A)", " (SSC-A)",
+                                  "CD103#BUV395 (UV379-A)", "CD4#BUV496 (UV515-A)", 
+                                  "CD8a#BUV615 (UV610-A)", "CD86#BUV735 (UV735-A)", 
+                                  "CD62L#BV421 (V431-A)", "XCR1#BV510 (V525-A)", 
+                                  "Ly6C#BV570 (V586-A)", "CD161#BV605 (V605-A)", 
+                                  "Ly6G#BV650 (V677-A)", "CD64#BV711 (V710-A)", 
+                                  "CD11c#BV750 (V750-A)", "F4/80#BV786 (V810-A)", 
+                                  "MHCII#FITC (B530-A)", "CD69#BB700 (B710-A)", 
+                                  "CD3e#PE (YG586-A)", "CD11b#PE-CF594 (YG610-A)", 
+                                  "CD19#PE-Cy5 (YG670-A)", "PD1#PE-Cy7 (YG780-A)", 
+                                  "CD63#AF647 (R670-A)", "CD44#RedFluor710 (R730-A)"), 
+                 cellType = "Mature cDC1s", dataset = "mouse_spleen_flow_cytometry", 
+                 fileName = "output/EMDHor_CN_noCtrls_toMid_densityPlots_matureCDC1s.pdf")
+```
+
+#### macrophages
+```{r}
+EMDVert_densities(methods = methods, 
+                  cols_to_plot = c(" (FSC-A)", " (SSC-A)"), 
+                  cellType = "Macrophages", dataset = "mouse_spleen_flow_cytometry", 
+                  fileName = "output/EMDVer_densityPlots_macrophages.pdf")
+
+EMDHor_densities(method = "cytonorm_no_controls_to_goal", 
+                  cols_to_plot = c(" (FSC-A)", " (SSC-A)"), 
+                  cellType = "Macrophages", dataset = "mouse_spleen_flow_cytometry", 
+                  fileName = "output/EMDHor_CN_noCtrls_toGoal_densityPlots_macrophages.pdf")
+EMDHor_densities(method = "cytonorm_no_controls_to_mid", 
+                  cols_to_plot = c(" (FSC-A)", " (SSC-A)"), 
+                  cellType = "Macrophages", dataset = "mouse_spleen_flow_cytometry", 
+                  fileName = "output/EMDHor_CN_noCtrls_toMid_densityPlots_macrophages.pdf")
 ```
 
 
