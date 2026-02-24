@@ -1,5 +1,6 @@
-data/*
-
+datasets/*
+utils/.*
+utils/_*
 
 .DS_Store
 /output
