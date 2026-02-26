@@ -6,3 +6,4 @@ utils/_*
 /output
 .Rproj.user
 /intermediate_files
+/data
