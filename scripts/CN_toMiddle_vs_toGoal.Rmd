@@ -60,6 +60,18 @@ dev.off()
 pdf("output/EMDVer2_CN_noCtrls_toMid_heatmap.pdf", height = 8)
 EMDVert_heatmap(EMD_toMid$uns$emd_values$emd_values_vert_split2)
 dev.off()
+
+dif <- EMD_toGoal$uns$emd_values$emd_values_horiz
+dif[,1:22] <- dif[,1:22] - EMD_toMid$uns$emd_values$emd_values_horiz[,1:22]
+pdf("output/EMDHor_CN_noCtrls_toGoal-EMDHor_CN_noCtrls_toMid_heatmap.pdf", height = 8)
+EMDHor_heatmap(dif)
+dev.off()
+
+ratio <- EMD_toGoal$uns$emd_values$emd_values_horiz
+ratio[,1:22] <- ratio[,1:22] / EMD_toMid$uns$emd_values$emd_values_horiz[,1:22]
+pdf("output/ratio_EMDHor_CN_noCtrls_toGoal_EMDHor_CN_noCtrls_toMid_heatmap.pdf", height = 8)
+EMDHor_heatmap(ratio)
+dev.off()
 ```
 Problematic horizontal:
 CD64#BV711 and CD19#PE-Cy5 for monocytes and neutrophils
