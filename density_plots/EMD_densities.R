@@ -234,7 +234,6 @@ EMDHor_makePlots <- function(method,
               anndata_to_df(i_adata = anndata::read_h5ad(integrated_dataset_s2),
                             u_adata = unintegrated, split_id = "split2"))
   df$group <- factor(df$group)
-  print(df)
   for (donor in unique(df$donor)){
     writeLines(as.character(donor))
     method_short <- sub("batchadjust", "BA", 
